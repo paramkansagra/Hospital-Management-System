@@ -1,0 +1,26 @@
+package com.paramkansagra.Hospital.Management.System.controller;
+
+import com.paramkansagra.Hospital.Management.System.dto.PatientDTO;
+import com.paramkansagra.Hospital.Management.System.entity.Patient;
+import com.paramkansagra.Hospital.Management.System.services.PatientService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/patient")
+public class PatientController {
+
+
+    private final PatientService patientService;
+
+    public PatientController(PatientService patientService){
+        this.patientService = patientService;
+    }
+
+    @GetMapping("/{id}")
+    public PatientDTO getPatientById(@PathVariable Long id){
+        return patientService.getPatientById(id);
+    }
+}
