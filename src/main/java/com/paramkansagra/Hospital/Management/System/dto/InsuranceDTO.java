@@ -14,29 +14,24 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PatientDTO {
+public class InsuranceDTO {
     @NotEmpty
     private Long Id;
 
     @NotEmpty
-    @Size(min = 3, max = 30, message = "Name must be size between 3 and 30")
-    private String name;
+    @Size(min = 1, max = 50, message = "Policy Number must be size between 1 and 50")
+    private String policyNumber;
 
     @NotEmpty
-    @PastOrPresent
-    private LocalDate birthdate;
+    @Size(min = 1 , max = 100 , message = "Provider Name must be size between 1 and 100")
+    private String provider;
 
     @NotEmpty
-    @Email
-    private String email;
-
-    @NotEmpty
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
+    private LocalDate validUntil;
 
     @NotEmpty
     private LocalDate createdAt;
 
-    @Enumerated(EnumType.STRING)
-    private BloodGroup bloodGroup;
+    @NotEmpty
+    private Long patient_insurance_id;
 }

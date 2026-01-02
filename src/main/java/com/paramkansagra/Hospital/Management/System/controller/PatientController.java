@@ -3,10 +3,9 @@ package com.paramkansagra.Hospital.Management.System.controller;
 import com.paramkansagra.Hospital.Management.System.dto.PatientDTO;
 import com.paramkansagra.Hospital.Management.System.entity.Patient;
 import com.paramkansagra.Hospital.Management.System.services.PatientService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/patient")
@@ -22,5 +21,10 @@ public class PatientController {
     @GetMapping("/{id}")
     public PatientDTO getPatientById(@PathVariable Long id){
         return patientService.getPatientById(id);
+    }
+
+    @GetMapping("/name={name}")
+    public List<PatientDTO> getPatientByName(@PathVariable String name){
+        return patientService.getPatientByName(name);
     }
 }

@@ -9,6 +9,8 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PatientServiceImpl implements PatientService {
 
@@ -26,5 +28,20 @@ public class PatientServiceImpl implements PatientService {
         Patient p1 = patientRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Patient with id -> " + id + " not found"));
 
         return modelMapper.map(p1 , PatientDTO.class);
+    }
+
+    @Override
+    @Transactional
+    public List<PatientDTO> getPatientByName(String name){
+        List<Patient> patientList = patientRepository.findByName(name);
+
+        return patientList.stream().map((patient) -> modelMapper.map(patient , PatientDTO.class)).toList();
+    }
+
+    @Override
+    public List<PatientDTO> getPatientByNameOrEmail(String name, String email) {
+        List<Patient> patientList = patientRepository.findByNameOrEmail(name , email);
+
+        return patientList.stream().map((patient) -> modelMapper.map(patient , PatientDTO.class)).toList();
     }
 }
