@@ -1,12 +1,12 @@
 package com.paramkansagra.Hospital.Management.System.entity.PatientEnums;
 
 public enum BloodGroup {
-    A_POSITVE,
-    A_NEGETIVE,
+    A_POSITIVE,
+    A_NEGATIVE,
     B_POSITIVE,
-    B_NEGETIVE,
+    B_NEGATIVE,
     AB_POSITIVE,
-    AB_NEGETIVE,
+    AB_NEGATIVE,
     O_POSITIVE,
-    O_NEGETIVE
+    O_NEGATIVE
 }

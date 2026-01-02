@@ -7,9 +7,11 @@ import com.paramkansagra.Hospital.Management.System.services.PatientService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PatientServiceImpl implements PatientService {
@@ -43,5 +45,10 @@ public class PatientServiceImpl implements PatientService {
         List<Patient> patientList = patientRepository.findByNameOrEmail(name , email);
 
         return patientList.stream().map((patient) -> modelMapper.map(patient , PatientDTO.class)).toList();
+    }
+
+    @Override
+    public List<PatientDTO> getAllPatients(Integer pageNumber , Integer pageSize){
+        return patientRepository.findAll(Pageable.ofSize(pageSize).withPage(pageNumber)).stream().map(patient -> modelMapper.map(patient , PatientDTO.class)).toList();
     }
 }

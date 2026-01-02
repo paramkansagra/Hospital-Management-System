@@ -1,5 +1,6 @@
 package com.paramkansagra.Hospital.Management.System.services.servicesImpl;
 
+import com.paramkansagra.Hospital.Management.System.dto.AppointmentDTO;
 import com.paramkansagra.Hospital.Management.System.entity.Appointment;
 import com.paramkansagra.Hospital.Management.System.entity.Doctor;
 import com.paramkansagra.Hospital.Management.System.entity.Patient;
@@ -10,7 +11,11 @@ import com.paramkansagra.Hospital.Management.System.services.AppointmentService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +23,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     @Transactional
@@ -56,5 +62,10 @@ public class AppointmentServiceImpl implements AppointmentService {
         doctorRepository.save(doctor);
 
         return appointment;
+    }
+
+    @Override
+    public List<AppointmentDTO> getAllAppointments(){
+        return appointmentRepository.findAll().stream().map((element) -> modelMapper.map(element, AppointmentDTO.class)).collect(Collectors.toList());
     }
 }

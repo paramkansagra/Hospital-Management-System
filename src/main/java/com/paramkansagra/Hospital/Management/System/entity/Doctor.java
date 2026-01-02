@@ -33,7 +33,7 @@ public class Doctor {
     private String email;
 
     @CreationTimestamp
-    @Column(nullable = false , updatable = false)
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "doctor")
