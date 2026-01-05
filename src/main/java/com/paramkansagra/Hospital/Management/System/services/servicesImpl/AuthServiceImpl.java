@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -20,6 +21,8 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+
+    private final PasswordEncoder passwordEncoder;
 
     private final AuthenticationManager authenticationManager;
     private final AuthUtil authUtil;
@@ -29,7 +32,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getUsername(), loginRequestDTO.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequestDTO.getUsername(),
+                        loginRequestDTO.getPassword()
+                )
+        );
 
         User user = (User) authentication.getPrincipal();
 
@@ -45,12 +53,14 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = userRepository.save(
-                        User.builder()
-                                .username(signupRequestDTO.getUsername())
-                                .password(signupRequestDTO.getPassword())
-                                .build()
+                User.builder()
+                        .username(signupRequestDTO.getUsername())
+                        .password(
+                                passwordEncoder.encode(signupRequestDTO.getPassword())
+                        )
+                        .build()
         );
 
-        return modelMapper.map(user , SignupResponseDTO.class);
+        return modelMapper.map(user, SignupResponseDTO.class);
     }
 }

@@ -3,7 +3,6 @@ package com.paramkansagra.Hospital.Management.System.security;
 import com.paramkansagra.Hospital.Management.System.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +19,7 @@ public class AuthUtil {
         return Keys.hmacShaKeyFor(jwtSecretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateAccessToken(@NotNull User user){
+    public String generateAccessToken(User user){
         return Jwts.builder()
                 .subject(user.getUsername())
                 .claim("userId" , user.getUsername())
@@ -28,5 +27,14 @@ public class AuthUtil {
                 .expiration(new Date(System.currentTimeMillis() + 1000*60*10))
                 .signWith(getSecretKey())
                 .compact();
+    }
+
+    public String getUsernameFromToken(String token){
+        return Jwts.parser()
+                .verifyWith(getSecretKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
     }
 }
