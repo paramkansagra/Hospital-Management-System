@@ -1,9 +1,12 @@
 package com.paramkansagra.Hospital.Management.System.security;
 
+import com.paramkansagra.Hospital.Management.System.entity.AuthProviderEnums.AuthProviderTypeEnums;
 import com.paramkansagra.Hospital.Management.System.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -11,30 +14,73 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
+@Slf4j
 public class AuthUtil {
     @Value("${jwt.secretKey}")
     private String jwtSecretKey;
 
-    private SecretKey getSecretKey(){
+    private SecretKey getSecretKey() {
         return Keys.hmacShaKeyFor(jwtSecretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateAccessToken(User user){
+    public String generateAccessToken(User user) {
         return Jwts.builder()
                 .subject(user.getUsername())
-                .claim("userId" , user.getUsername())
+                .claim("userId", user.getUsername())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000*60*10))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10))
                 .signWith(getSecretKey())
                 .compact();
     }
 
-    public String getUsernameFromToken(String token){
+    public String getUsernameFromToken(String token) {
         return Jwts.parser()
                 .verifyWith(getSecretKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+    }
+
+    public AuthProviderTypeEnums getProviderTypeFromRegistrationId(String registrationId) {
+        return switch (registrationId.toLowerCase()) {
+            case "google" -> AuthProviderTypeEnums.GOOGLE;
+            case "github" -> AuthProviderTypeEnums.GITHUB;
+            case "twitter" -> AuthProviderTypeEnums.TWITTER;
+            case "facebook" -> AuthProviderTypeEnums.FACEBOOK;
+            default -> throw new IllegalArgumentException("Unsupported OAuth2 provider : " + registrationId);
+        };
+    }
+
+    public String determineProviderIdFromOAuth2User(OAuth2User oAuth2User, AuthProviderTypeEnums authProviderTypeEnums) {
+        String providerId = switch (authProviderTypeEnums) {
+            case AuthProviderTypeEnums.GOOGLE -> oAuth2User.getAttribute("sub");
+            case AuthProviderTypeEnums.GITHUB -> oAuth2User.getAttribute("id").toString();
+            default -> {
+                log.error("Unsupported OAuth2 provider : {}", authProviderTypeEnums);
+                throw new IllegalArgumentException("Unsupported OAuth2 provider: " + authProviderTypeEnums);
+            }
+        };
+
+        if (providerId == null || providerId.isBlank()) {
+            log.error("Unable to determine providerId for the provider : {}", authProviderTypeEnums);
+            throw new IllegalArgumentException("Unable to determine providerId for OAuth2 login");
+        }
+
+        return providerId;
+    }
+
+    public String determineUsernameFromOAuth2User(OAuth2User oAuth2User, AuthProviderTypeEnums authProviderTypeEnums, String providerId){
+        String email = oAuth2User.getAttribute("email");
+
+        if(email != null && !email.isBlank()){
+            return email;
+        }
+
+         return switch (authProviderTypeEnums){
+             case AuthProviderTypeEnums.GOOGLE -> oAuth2User.getAttribute("sub");
+             case AuthProviderTypeEnums.GITHUB -> oAuth2User.getAttribute("login");
+             default -> providerId;
+         };
     }
 }

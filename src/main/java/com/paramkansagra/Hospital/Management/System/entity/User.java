@@ -1,5 +1,6 @@
 package com.paramkansagra.Hospital.Management.System.entity;
 
+import com.paramkansagra.Hospital.Management.System.entity.AuthProviderEnums.AuthProviderTypeEnums;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,6 +27,11 @@ public class User implements UserDetails {
     private String username;
 
     private String password;
+
+    private String providerId;
+
+    @Enumerated(EnumType.STRING)
+    private AuthProviderTypeEnums providerType;
 
     // Returns what all authorities that the user has
     @Override
